@@ -38,7 +38,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
@@ -74,7 +74,7 @@ public class PuffExplosion extends Explosion {
         this.y = y;
         this.z = z;
         this.destructionType = destructionType;
-        this.damageSource = damageSource == null ? DamageSource.explosion(this) : damageSource;
+        this.damageSource = damageSource == null ? entity.damageSources().explosion(this) : damageSource;
         this.behavior = explosionBehavior == null ? this.chooseBehavior(entity) : explosionBehavior;
         this.spawnPuff = spawnPuff;
     }
@@ -156,7 +156,7 @@ public class PuffExplosion extends Explosion {
                         double o = this.z;
 
                         for (; h > 0.0F; h -= 0.22500001F) {
-                            BlockPos blockPos = new BlockPos(m, n, o);
+                            BlockPos blockPos = BlockPos.containing(m, n, o);
                             BlockState blockState = this.world.getBlockState(blockPos);
                             FluidState fluidState = this.world.getFluidState(blockPos);
                             Optional<Float> optional = this.behavior.getBlockExplosionResistance(this, this.world, blockPos, blockState, fluidState);
@@ -240,7 +240,7 @@ public class PuffExplosion extends Explosion {
             this.world.playLocalSound(this.x, this.y, this.z, SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, 4.0F, (1.0F + (this.world.random.nextFloat() - this.world.random.nextFloat()) * 0.2F) * 0.7F, false);
         }
 
-        boolean bl2 = this.destructionType != PuffExplosion.BlockInteraction.NONE;
+        boolean bl2 = this.destructionType != PuffExplosion.BlockInteraction.KEEP;
         if (bl) {
             if (this.power >= 2.0F && bl2) {
                 this.world.addParticle(ParticleTypes.EXPLOSION_EMITTER, this.x, this.y, this.z, 1.0D, 0.0D, 0.0D);
@@ -261,7 +261,7 @@ public class PuffExplosion extends Explosion {
                     this.world.getProfiler().push("explosion_blocks");
                     if (blockState.canDropFromExplosion(this.world, blockPos, this) && this.world instanceof ServerLevel) {
                         BlockEntity blockEntity = this.world.getBlockEntity(blockPos);
-                        LootContext.Builder builder = (new LootContext.Builder((ServerLevel) this.world)).withRandom(this.world.random).withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(blockPos)).withParameter(LootContextParams.TOOL, ItemStack.EMPTY).withOptionalParameter(LootContextParams.BLOCK_ENTITY, blockEntity).withOptionalParameter(LootContextParams.THIS_ENTITY, this.entity);
+                        LootParams.Builder builder = (new LootParams.Builder((ServerLevel) this.world)).withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(blockPos)).withParameter(LootContextParams.TOOL, ItemStack.EMPTY).withOptionalParameter(LootContextParams.BLOCK_ENTITY, blockEntity).withOptionalParameter(LootContextParams.THIS_ENTITY, this.entity);
                         if (this.destructionType == BlockInteraction.DESTROY) {
                             builder.withParameter(LootContextParams.EXPLOSION_RADIUS, this.power);
                         }

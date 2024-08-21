@@ -1,7 +1,7 @@
 package ladysnake.snowmercy.common.entity;
 
-import com.mojang.math.Quaternion;
-import com.mojang.math.Vector3f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import ladysnake.snowmercy.common.entity.ai.goal.DeployHeadsGoal;
 import ladysnake.snowmercy.common.entity.ai.goal.FollowGoal;
@@ -17,6 +17,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -33,21 +34,21 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.PlayState;
-import software.bernie.geckolib3.core.builder.AnimationBuilder;
-import software.bernie.geckolib3.core.builder.ILoopType;
-import software.bernie.geckolib3.core.controller.AnimationController;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.Animation;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.RawAnimation;
+import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
-public class HeadmasterEntity extends Monster implements IAnimatable, SnowMercyEnemy {
+public class HeadmasterEntity extends Monster implements GeoEntity, SnowMercyEnemy {
     private static final EntityDataAccessor<Boolean> SHOOTING = SynchedEntityData.defineId(HeadmasterEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> TURRET_TRANSITION = SynchedEntityData.defineId(HeadmasterEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> TURRET_MODE = SynchedEntityData.defineId(HeadmasterEntity.class, EntityDataSerializers.BOOLEAN);
-    private AnimationFactory factory = GeckoLibUtil.createFactory(this);
+    private AnimatableInstanceCache factory = GeckoLibUtil.createInstanceCache(this);
 
     public HeadmasterEntity(EntityType<? extends HeadmasterEntity> entityType, Level world) {
         super(entityType, world);
@@ -87,19 +88,19 @@ public class HeadmasterEntity extends Monster implements IAnimatable, SnowMercyE
         this.entityData.define(TURRET_TRANSITION, 100);
     }
 
-    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
+    private <E extends GeoEntity> PlayState predicate(AnimationState<E> event) {
         if (this.isTurret()) {
             if (this.getTurretTransitionning() > 0) {
-                event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.headmaster.transition", ILoopType.EDefaultLoopTypes.PLAY_ONCE));
+                event.getController().setAnimation(RawAnimation.begin().then("animation.headmaster.transition", Animation.LoopType.PLAY_ONCE));
                 this.setTurretTransitionning(this.getTurretTransitionning() - 1);
             } else {
-                event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.headmaster.turret", ILoopType.EDefaultLoopTypes.LOOP));
+                event.getController().setAnimation(RawAnimation.begin().then("animation.headmaster.turret", Animation.LoopType.LOOP));
             }
         } else {
             if (isShooting()) {
-                event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.headmaster.sendhead", ILoopType.EDefaultLoopTypes.LOOP));
+                event.getController().setAnimation(RawAnimation.begin().then("animation.headmaster.sendhead", Animation.LoopType.LOOP));
             } else {
-                event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.headmaster.standard", ILoopType.EDefaultLoopTypes.LOOP));
+                event.getController().setAnimation(RawAnimation.begin().then("animation.headmaster.standard", Animation.LoopType.LOOP));
             }
         }
         return PlayState.CONTINUE;
@@ -158,10 +159,11 @@ public class HeadmasterEntity extends Monster implements IAnimatable, SnowMercyE
         FreezingWindEntity entity = new FreezingWindEntity(this.level, this);
         entity.setPos(this.getX(), this.getY() + 2f, this.getZ());
         Vec3 vec3d = this.getUpVector(1.0F);
-        Quaternion quaternion = new Quaternion(new Vector3f(vec3d), 0f, true);
+        Vector3f vector3f1 = new Vector3f((float)vec3d.x, (float)vec3d.y, (float)vec3d.z);
+        Quaternionf quaternion = new Quaternionf().setAngleAxis(Math.toRadians(0.0F), vector3f1.x, vector3f1.y, vector3f1.z);
         Vec3 vec3d2 = this.getViewVector(1.0F);
-        Vector3f vector3f = new Vector3f(vec3d2);
-        vector3f.transform(quaternion);
+        Vector3f vector3f = new Vector3f((float)vec3d2.x, (float)vec3d2.y, (float)vec3d2.z);
+        vector3f.rotate(quaternion);
         entity.shoot(vector3f.x(), vector3f.y(), vector3f.z(), 3f, 5f);
         level.addFreshEntity(entity);
         this.level.playSound(null, this.blockPosition(), SoundEvents.PLAYER_HURT_FREEZE, SoundSource.HOSTILE, 1.0f, 1.0f);
@@ -169,18 +171,18 @@ public class HeadmasterEntity extends Monster implements IAnimatable, SnowMercyE
     }
 
     @Override
-    public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
+    public void registerControllers(AnimatableManager.ControllerRegistrar animationData) {
+        animationData.add(new AnimationController<>(this, "controller", 0, this::predicate));
     }
 
     @Override
-    public AnimationFactory getFactory() {
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
         return this.factory;
     }
 
     @Override
     public boolean isInvulnerableTo(DamageSource damageSource) {
-        return super.isInvulnerableTo(damageSource) || damageSource == DamageSource.CACTUS || damageSource == DamageSource.DROWN || damageSource == DamageSource.FREEZE || damageSource == DamageSource.FALL || damageSource == DamageSource.CRAMMING;
+        return super.isInvulnerableTo(damageSource) || damageSource.is(DamageTypes.CACTUS) || damageSource.is(DamageTypes.DROWN) || damageSource.is(DamageTypes.FREEZE) || damageSource.is(DamageTypes.FALL) || damageSource.is(DamageTypes.CRAMMING);
     }
 
     @Override

@@ -10,7 +10,6 @@ import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.item.ItemStack;
@@ -28,7 +27,7 @@ public class ReviveSurgeGoal extends Goal {
     @Override
     public boolean canUse() {
         // if snowmen heads around
-        return !headmaster.level.getEntitiesOfClass(SnowGolemHeadEntity.class, this.headmaster.getBoundingBox().inflate(16f), snowGolemHeadEntity -> snowGolemHeadEntity.isAlive() && snowGolemHeadEntity.isOnGround()).isEmpty();
+        return !headmaster.level.getEntitiesOfClass(SnowGolemHeadEntity.class, this.headmaster.getBoundingBox().inflate(16f), snowGolemHeadEntity -> snowGolemHeadEntity.isAlive() && snowGolemHeadEntity.onGround()).isEmpty();
     }
 
     @Override
@@ -60,9 +59,9 @@ public class ReviveSurgeGoal extends Goal {
                 for (SnowGolemHeadEntity snowmanHead : headmaster.level.getEntitiesOfClass(SnowGolemHeadEntity.class, this.headmaster.getBoundingBox().inflate(16f), LivingEntity::isAlive)) {
                     ((ServerLevel) headmaster.level).sendParticles(new ItemParticleOption(ParticleTypes.ITEM, new ItemStack(Blocks.SNOW_BLOCK)), snowmanHead.getX(), snowmanHead.getY(), snowmanHead.getZ(), 100, random.nextGaussian() / 3f, random.nextGaussian() + 1 / 3f, random.nextGaussian() / 3f, 0.2f);
                     ((ServerLevel) headmaster.level).sendParticles(ParticleTypes.TOTEM_OF_UNDYING, snowmanHead.getX(), snowmanHead.getY(), snowmanHead.getZ(), 50, random.nextGaussian() / 3f, random.nextGaussian() + 1 / 3f, random.nextGaussian() / 3f, 0.2f);
-                    snowmanHead.hurt(DamageSource.GENERIC, 1.0f);
+                    snowmanHead.hurt(snowmanHead.damageSources().generic(), 1.0f);
                     WeaponizedSnowGolemEntity golem = snowmanHead.getGolemType().getEntityType().create(headmaster.level);
-                    BlockPos blockPos = snowmanHead.blockPosition().offset(0d, 0d, 0d);
+                    BlockPos blockPos = snowmanHead.blockPosition().offset(0, 0, 0);
                     assert golem != null;
                     golem.moveTo((double) blockPos.getX() + 0.5D, (double) blockPos.getY() + 0.05D, (double) blockPos.getZ() + 0.5D, 0.0F, 0.0F);
                     headmaster.level.addFreshEntity(golem);

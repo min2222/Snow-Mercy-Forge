@@ -12,8 +12,8 @@ import ladysnake.snowmercy.common.SnowMercy;
 import ladysnake.snowmercy.common.init.SnowMercyFeatures;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
 import net.minecraft.core.Vec3i;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.ChunkPos;
@@ -60,7 +60,7 @@ public class IcepostFeature extends Structure
         {
             WorldgenRandom chunkRandom = ctx.random();
             
-            StructureTemplatePool structuretemplatepool = ctx.registryAccess().registryOrThrow(Registry.TEMPLATE_POOL_REGISTRY).get(new ResourceLocation(SnowMercy.MODID, "icepost"));
+            StructureTemplatePool structuretemplatepool = ctx.registryAccess().registryOrThrow(Registries.TEMPLATE_POOL).get(new ResourceLocation(SnowMercy.MODID, "icepost"));
             StructurePoolElement spawnedStructure = structuretemplatepool.getRandomTemplate(chunkRandom);
 
             if (spawnedStructure != EmptyPoolElement.INSTANCE) {

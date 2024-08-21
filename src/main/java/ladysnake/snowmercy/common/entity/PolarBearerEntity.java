@@ -4,7 +4,6 @@ import org.jetbrains.annotations.Nullable;
 
 import ladysnake.snowmercy.common.entity.ai.goal.GoToHeartGoal;
 import ladysnake.snowmercy.common.init.SnowMercyEntities;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -25,6 +24,7 @@ import net.minecraft.world.entity.animal.PolarBear;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraftforge.event.ForgeEventFactory;
 
 public class PolarBearerEntity extends PolarBear implements SnowMercyEnemy {
     public PolarBearerEntity(EntityType<? extends PolarBear> entityType, Level world) {
@@ -89,8 +89,8 @@ public class PolarBearerEntity extends PolarBear implements SnowMercyEnemy {
 
     @Override
     @Nullable
-    public Entity getControllingPassenger() {
-        return this.getFirstPassenger();
+    public LivingEntity getControllingPassenger() {
+        return (@Nullable LivingEntity) this.getFirstPassenger();
     }
 
     @Override
@@ -100,7 +100,7 @@ public class PolarBearerEntity extends PolarBear implements SnowMercyEnemy {
         if (!level.isClientSide) {
             if (this.age <= 5 && this.getPassengers().isEmpty()) {
                 RocketsEntity rider = SnowMercyEntities.ROCKETS.get().create(level);
-                rider.finalizeSpawn((ServerLevelAccessor) level, level.getCurrentDifficultyAt(this.blockPosition()), MobSpawnType.JOCKEY, null, null);
+                ForgeEventFactory.onFinalizeSpawn(rider, (ServerLevelAccessor) level, level.getCurrentDifficultyAt(this.blockPosition()), MobSpawnType.JOCKEY, null, null);
                 rider.setPos(this.getX(), this.getY(), this.getZ());
                 rider.setPersistenceRequired();
                 rider.startRiding(this);

@@ -3,6 +3,8 @@ package ladysnake.snowmercy.common.item;
 import java.util.ArrayList;
 import java.util.Random;
 
+import com.eliotlash.mclib.utils.MathHelper;
+
 import ladysnake.snowmercy.common.init.SnowMercyEntities;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
@@ -13,7 +15,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import software.bernie.shadowed.eliotlash.mclib.utils.MathHelper;
 
 public class SnowMercySummonerItem extends Item {
 

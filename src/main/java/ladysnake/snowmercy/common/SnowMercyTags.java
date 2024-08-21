@@ -1,6 +1,6 @@
 package ladysnake.snowmercy.common;
 
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
@@ -10,6 +10,6 @@ public class SnowMercyTags {
 	
 	private static TagKey<EntityType<?>> createEntityTypeTagKey(String p_203849_) 
 	{
-		return TagKey.create(Registry.ENTITY_TYPE_REGISTRY, new ResourceLocation(SnowMercy.MODID, p_203849_));
+		return TagKey.create(Registries.ENTITY_TYPE, new ResourceLocation(SnowMercy.MODID, p_203849_));
 	}
 }

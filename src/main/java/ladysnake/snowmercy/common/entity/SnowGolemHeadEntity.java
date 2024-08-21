@@ -99,20 +99,20 @@ public class SnowGolemHeadEntity extends WeaponizedSnowGolemEntity {
     public void tick() {
         super.tick();
 
-        if (this.level.getBlockState(this.blockPosition().offset(0d, -1d, 0d)).getBlock() == Blocks.SNOW_BLOCK
-                && this.level.getBlockState(this.blockPosition().offset(0d, -2d, 0d)).getBlock() == Blocks.SNOW_BLOCK) {
-            this.hurt(DamageSource.GENERIC, 1.0f);
-            this.level.destroyBlock(this.blockPosition().offset(0d, -1d, 0d), false);
-            this.level.destroyBlock(this.blockPosition().offset(0d, -2d, 0d), false);
+        if (this.level.getBlockState(this.blockPosition().offset(0, -1, 0)).getBlock() == Blocks.SNOW_BLOCK
+                && this.level.getBlockState(this.blockPosition().offset(0, -2, 0)).getBlock() == Blocks.SNOW_BLOCK) {
+            this.hurt(this.damageSources().generic(), 1.0f);
+            this.level.destroyBlock(this.blockPosition().offset(0, -1, 0), false);
+            this.level.destroyBlock(this.blockPosition().offset(0, -2, 0), false);
             WeaponizedSnowGolemEntity golem = this.getGolemType().getEntityType().create(this.level);
-            BlockPos blockPos = this.blockPosition().offset(0d, -2d, 0d);
+            BlockPos blockPos = this.blockPosition().offset(0, -2, 0);
             assert golem != null;
             golem.moveTo((double) blockPos.getX() + 0.5D, (double) blockPos.getY() + 0.05D, (double) blockPos.getZ() + 0.5D, 0.0F, 0.0F);
             level.addFreshEntity(golem);
         }
 
         if (this.tickCount >= MAX_AGE) {
-            this.hurt(DamageSource.GENERIC, 1.0f);
+            this.hurt(this.damageSources().generic(), 1.0f);
         }
     }
 
@@ -123,7 +123,7 @@ public class SnowGolemHeadEntity extends WeaponizedSnowGolemEntity {
         double speed = Math.sqrt(this.getDeltaMovement().x * this.getDeltaMovement().x + this.getDeltaMovement().y * this.getDeltaMovement().y + this.getDeltaMovement().z * this.getDeltaMovement().z);
 
         if (speed > 0.5f) {
-            player.hurt(DamageSource.indirectMobAttack(this, this), (float) speed);
+            player.hurt(this.damageSources().mobProjectile(this, this), (float) speed);
         }
     }
 
@@ -133,7 +133,7 @@ public class SnowGolemHeadEntity extends WeaponizedSnowGolemEntity {
         float h = Mth.cos(yaw * 0.017453292F) * Mth.cos(pitch * 0.017453292F);
         this.setVelocity(f, g, h, modifierZ, modifierXYZ);
         Vec3 vec3d = user.getDeltaMovement();
-        this.setDeltaMovement(this.getDeltaMovement().add(vec3d.x, user.isOnGround() ? 0.0D : vec3d.y, vec3d.z));
+        this.setDeltaMovement(this.getDeltaMovement().add(vec3d.x, user.onGround() ? 0.0D : vec3d.y, vec3d.z));
     }
 
     public void setVelocity(double x, double y, double z, float speed, float divergence) {

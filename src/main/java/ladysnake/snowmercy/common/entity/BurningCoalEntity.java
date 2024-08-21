@@ -3,7 +3,6 @@ package ladysnake.snowmercy.common.entity;
 import ladysnake.snowmercy.common.init.SnowMercyEntities;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -113,7 +112,7 @@ public class BurningCoalEntity extends ThrowableProjectile {
         for (Entity entity : level.getEntities(this, this.getBoundingBox().inflate(BURN_RADIUS), entity -> entity != this.getOwner())) {
             if (!(entity instanceof ItemEntity)) {
                 entity.setSecondsOnFire((int) (10 * Math.sqrt(entity.blockPosition().distSqr(this.blockPosition()))));
-                entity.hurt(DamageSource.IN_FIRE, 2f);
+                entity.hurt(this.damageSources().inFire(), 2f);
             }
         }
     }

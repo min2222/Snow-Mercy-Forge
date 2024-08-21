@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -73,7 +73,7 @@ public class SnowMercyCommonForge
     
     public static ResourceKey<Level> getWinterDimension() {
         ResourceLocation resourcelocation = new ResourceLocation(SnowMercy.MODID, "winter_murderland");
-        ResourceKey<Level> registrykey = ResourceKey.create(Registry.DIMENSION_REGISTRY, resourcelocation);
+        ResourceKey<Level> registrykey = ResourceKey.create(Registries.DIMENSION, resourcelocation);
         return registrykey;
     }
 }

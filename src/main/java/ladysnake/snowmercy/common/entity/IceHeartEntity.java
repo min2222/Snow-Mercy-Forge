@@ -17,6 +17,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -35,6 +36,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraftforge.event.ForgeEventFactory;
 	
 public class IceHeartEntity extends Entity {
     public static final int SPAWN_RADIUS = 100;
@@ -74,7 +76,7 @@ public class IceHeartEntity extends Entity {
     }
 
     @Override
-    public Packet<?> getAddEntityPacket() {
+    public Packet<ClientGamePacketListener> getAddEntityPacket() {
         return new ClientboundAddEntityPacket(this);
     }
 
@@ -155,7 +157,7 @@ public class IceHeartEntity extends Entity {
 
                     Mob enemy = SnowMercyWaves.WAVES.get(wave).get(i).entityType.create(this.level);
 
-                    enemy.finalizeSpawn((ServerLevelAccessor) level, level.getCurrentDifficultyAt(this.blockPosition()), MobSpawnType.MOB_SUMMONED, null, null);
+                    ForgeEventFactory.onFinalizeSpawn(enemy, (ServerLevelAccessor) level, level.getCurrentDifficultyAt(this.blockPosition()), MobSpawnType.MOB_SUMMONED, null, null);
 
                     var angle = Math.random() * Math.PI * 2;
                     float x = (float) (this.getX() + (Math.cos(angle) * SPAWN_RADIUS));
@@ -166,7 +168,7 @@ public class IceHeartEntity extends Entity {
                         z = (float) (this.getZ() + (Math.sin(angle) * (SPAWN_RADIUS / 5f)));
                     }
 
-                    BlockPos offsetPos = new BlockPos(x, this.getY(), z);
+                    BlockPos offsetPos = BlockPos.containing(x, this.getY(), z);
                     for (int groundOffset = -10; groundOffset < 10; groundOffset++) {
                         if ((level.getBlockState(offsetPos.offset(0, groundOffset, 0)).isAir() || level.getBlockState(offsetPos.offset(0, groundOffset, 0)).getBlock() == Blocks.SNOW) && level.getBrightness(LightLayer.SKY, offsetPos.offset(0, groundOffset, 0)) >= 15f && (level.getBlockState(offsetPos.offset(0, groundOffset - 1, 0)).isRedstoneConductor(level, offsetPos.offset(0, groundOffset - 1, 0)) || level.getBlockState(offsetPos.offset(0, groundOffset - 1, 0)).getBlock() == Blocks.ICE)) {
                             enemy.setPos(offsetPos.getX(), offsetPos.getY() + groundOffset, offsetPos.getZ());

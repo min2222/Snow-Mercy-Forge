@@ -19,6 +19,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -157,7 +158,7 @@ public abstract class WeaponizedSnowGolemEntity extends PathfinderMob implements
     @Override
     public boolean hurt(DamageSource source, float amount) {
         if (!level.isClientSide) {
-            if ((source == DamageSource.ON_FIRE || source == DamageSource.IN_FIRE) && this.isAlive()) {
+            if ((source.is(DamageTypes.ON_FIRE) || source.is(DamageTypes.IN_FIRE)) && this.isAlive()) {
                 this.setInvisible(true);
                 this.setSilent(true);
                 this.setGlowingTag(false);

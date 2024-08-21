@@ -1,7 +1,7 @@
 package ladysnake.snowmercy.common.entity;
 
-import com.mojang.math.Quaternion;
-import com.mojang.math.Vector3f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import ladysnake.snowmercy.common.entity.ai.goal.SalvoProjectileAttackGoal;
 import net.minecraft.nbt.CompoundTag;
@@ -53,10 +53,11 @@ public class RocketsEntity extends WeaponizedSnowGolemEntity implements RangedAt
     public void performRangedAttack(LivingEntity target, float pullProgress) {
         FireworkRocketEntity fireworkRocketEntity = new FireworkRocketEntity(level, FIREWORKS, this, this.getX(), this.getEyeY() - 0.15000000596046448D, this.getZ(), true);
         Vec3 vec3d = this.getUpVector(1.0F);
-        Quaternion quaternion = new Quaternion(new Vector3f(vec3d), 0f, true);
+        Vector3f vector3f1 = new Vector3f((float)vec3d.x, (float)vec3d.y, (float)vec3d.z);
+        Quaternionf quaternion = new Quaternionf().setAngleAxis(Math.toRadians(0.0F), vector3f1.x, vector3f1.y, vector3f1.z);
         Vec3 vec3d2 = this.getViewVector(1.0F);
-        Vector3f vector3f = new Vector3f(vec3d2);
-        vector3f.transform(quaternion);
+        Vector3f vector3f = new Vector3f((float)vec3d2.x, (float)vec3d2.y, (float)vec3d2.z);
+        vector3f.rotate(quaternion);
         fireworkRocketEntity.shoot(vector3f.x(), vector3f.y(), vector3f.z(), 3f, 5f);
         level.addFreshEntity(fireworkRocketEntity);
     }

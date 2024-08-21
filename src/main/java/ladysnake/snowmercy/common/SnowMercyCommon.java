@@ -11,8 +11,9 @@ import ladysnake.snowmercy.common.entity.SnowGolemHeadEntity;
 import ladysnake.snowmercy.common.entity.SnugglesEntity;
 import ladysnake.snowmercy.common.entity.TundrabidEntity;
 import ladysnake.snowmercy.common.init.SnowMercyEntities;
-import ladysnake.snowmercy.common.init.SnowMercyBiomeTagsProvider;
-import net.minecraftforge.data.event.GatherDataEvent;
+import ladysnake.snowmercy.common.init.SnowMercyItems;
+import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -37,8 +38,16 @@ public class SnowMercyCommon
     }
     
     @SubscribeEvent
-    public static void gatherData(GatherDataEvent event)
+    public static void creativeTabBuild(BuildCreativeModeTabContentsEvent event)
     {
-    	event.getGenerator().addProvider(event.includeServer(), new SnowMercyBiomeTagsProvider(event.getGenerator(), SnowMercy.MODID, event.getExistingFileHelper()));
+    	if(event.getTabKey() == CreativeModeTabs.COMBAT)
+    	{
+    		event.accept(SnowMercyItems.SKILLOTINE.get());
+    		event.accept(SnowMercyItems.COAL_BURNER.get());
+    	}
+    	else if(event.getTabKey() == CreativeModeTabs.REDSTONE_BLOCKS)
+    	{
+    		event.accept(SnowMercyItems.SLEDGE.get());
+    	}
     }
 }

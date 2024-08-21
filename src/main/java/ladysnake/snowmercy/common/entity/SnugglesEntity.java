@@ -49,15 +49,15 @@ public class SnugglesEntity extends WeaponizedSnowGolemEntity {
     }
 
     public void explode() {
-        if (!this.getLevel().isClientSide()) {
+        if (!this.level.isClientSide()) {
             this.discard();
 
-            ServerLevel world = (ServerLevel) this.getLevel();
+            ServerLevel world = (ServerLevel) this.level;
 
             float power = 3.0f;
-            Explosion.BlockInteraction destructionType = Explosion.BlockInteraction.NONE;
+            Explosion.BlockInteraction destructionType = Explosion.BlockInteraction.KEEP;
 
-            Explosion explosion = new PuffExplosion(world, this, DamageSource.explosion(this), null, this.getX(), this.getY(), this.getZ(), power, 3f, destructionType, false);
+            Explosion explosion = new PuffExplosion(world, this, this.damageSources().explosion(this, this), null, this.getX(), this.getY(), this.getZ(), power, 3f, destructionType, false);
             explosion.explode();
             explosion.finalizeExplosion(false);
 
@@ -73,7 +73,7 @@ public class SnugglesEntity extends WeaponizedSnowGolemEntity {
             }
 
             Iterator<ServerPlayer> var14 = world.players().iterator();
-            if (destructionType == Explosion.BlockInteraction.NONE) {
+            if (destructionType == Explosion.BlockInteraction.KEEP) {
                 explosion.clearToBlow();
             }
 

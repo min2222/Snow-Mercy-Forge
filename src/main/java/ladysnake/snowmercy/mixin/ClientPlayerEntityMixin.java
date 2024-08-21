@@ -1,7 +1,5 @@
 package ladysnake.snowmercy.mixin;
 
-import javax.annotation.Nullable;
-
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -15,7 +13,6 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.Input;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.world.entity.player.ProfilePublicKey;
 
 @Mixin(LocalPlayer.class)
 public class ClientPlayerEntityMixin extends AbstractClientPlayer {
@@ -25,8 +22,8 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayer {
     @Shadow
     public boolean handsBusy;
 
-    public ClientPlayerEntityMixin(ClientLevel p_234112_, GameProfile p_234113_, @Nullable ProfilePublicKey p_234114_) {
-    	super(p_234112_, p_234113_, p_234114_);
+    public ClientPlayerEntityMixin(ClientLevel p_234112_, GameProfile p_234113_) {
+    	super(p_234112_, p_234113_);
     }
 
     @Inject(method = "rideTick", at = @At("TAIL"))

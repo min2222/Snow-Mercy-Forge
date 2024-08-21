@@ -60,7 +60,7 @@ public class SledgeItem extends Item {
             }
             if (!world.isClientSide) {
                 world.addFreshEntity((Entity) vec3d2);
-                world.gameEvent((Entity) user, GameEvent.ENTITY_PLACE, new BlockPos(hitResult.getLocation()));
+                world.gameEvent((Entity) user, GameEvent.ENTITY_PLACE, BlockPos.containing(hitResult.getLocation()));
                 if (!user.getAbilities().instabuild) {
                     itemStack.shrink(1);
                 }

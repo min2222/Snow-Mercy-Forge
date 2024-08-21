@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.jetbrains.annotations.Nullable;
 
+import com.eliotlash.mclib.utils.MathHelper;
 import com.google.common.collect.Lists;
 
 import ladysnake.snowmercy.common.init.SnowMercyDamageSources;
@@ -17,12 +18,14 @@ import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
@@ -48,13 +51,11 @@ import net.minecraft.world.level.block.WaterlilyBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import software.bernie.shadowed.eliotlash.mclib.utils.MathHelper;
 
 public class SledgeEntity extends Entity {
     public static final int field_30697 = 0;
@@ -201,7 +202,7 @@ public class SledgeEntity extends Entity {
     }
 
     @Override
-    public void animateHurt() {
+    public void animateHurt(float p_265161_) {
         this.setDamageWobbleSide(-this.getDamageWobbleSide());
         this.setDamageWobbleTicks(10);
         this.setDamageWobbleStrength(this.getDamageWobbleStrength() * 11.0f);
@@ -445,7 +446,7 @@ public class SledgeEntity extends Entity {
             for (int z = -1; z <= 1; z++) {
                 for (int y = -1; y <= 0; y++) {
                     BlockPos checkedPos = blockPosition().offset(x, y, z);
-                    if (this.level.getBlockState(checkedPos).getMaterial() == Material.SNOW || this.level.getBlockState(checkedPos).getMaterial() == Material.TOP_SNOW) {
+                    if (this.level.getBlockState(checkedPos).is(BlockTags.SNOW)) {
                         isOnSnow = true;
                     }
                 }
@@ -457,7 +458,7 @@ public class SledgeEntity extends Entity {
                 for (int z = -1; z <= 1; z++) {
                     for (int y = -1; y <= 0; y++) {
                         BlockPos checkedPos = blockPosition().offset(x, y, z);
-                        if (this.level.getBlockState(checkedPos).getMaterial() == Material.ICE || this.level.getBlockState(checkedPos).getMaterial() == Material.ICE_SOLID) {
+                        if (this.level.getBlockState(checkedPos).is(BlockTags.ICE)) {
                             isOnIce = true;
                         }
                     }
@@ -528,7 +529,7 @@ public class SledgeEntity extends Entity {
     }
 
     @Override
-    public void positionRider(Entity passenger) {
+    public void positionRider(Entity passenger, MoveFunction p_19958_) {
         if (!this.hasPassenger(passenger)) {
             return;
         }
@@ -558,7 +559,7 @@ public class SledgeEntity extends Entity {
         double e;
         Vec3 vec3d = SledgeEntity.getCollisionHorizontalEscapeVector(this.getBbWidth() * Mth.SQRT_OF_TWO, passenger.getBbWidth(), passenger.getYRot());
         double d = this.getX() + vec3d.x;
-        BlockPos blockPos = new BlockPos(d, this.getBoundingBox().maxY, e = this.getZ() + vec3d.z);
+        BlockPos blockPos = BlockPos.containing(d, this.getBoundingBox().maxY, e = this.getZ() + vec3d.z);
         BlockPos blockPos2 = blockPos.below();
         if (!this.level.isWaterAt(blockPos2)) {
             double g;
@@ -629,7 +630,7 @@ public class SledgeEntity extends Entity {
                     this.resetFallDistance();
                     return;
                 }
-                this.causeFallDamage(this.fallDistance, 1.0f, DamageSource.FALL);
+                this.causeFallDamage(this.fallDistance, 1.0f, this.damageSources().fall());
             }
             this.resetFallDistance();
         } else if (!this.level.getFluidState(this.blockPosition().below()).is(FluidTags.WATER) && heightDifference < 0.0) {
@@ -668,8 +669,8 @@ public class SledgeEntity extends Entity {
 
     @Override
     @Nullable
-    public Entity getControllingPassenger() {
-        return this.getFirstPassenger();
+    public LivingEntity getControllingPassenger() {
+        return (@Nullable LivingEntity) this.getFirstPassenger();
     }
 
     public void setInputs(boolean pressingLeft, boolean pressingRight, boolean pressingForward, boolean pressingBack) {
@@ -680,7 +681,7 @@ public class SledgeEntity extends Entity {
     }
 
     @Override
-    public Packet<?> getAddEntityPacket() {
+    public Packet<ClientGamePacketListener> getAddEntityPacket() {
         return new ClientboundAddEntityPacket(this);
     }
 

@@ -2,7 +2,7 @@ package ladysnake.snowmercy.client.render.entity;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 
 import ladysnake.snowmercy.client.SnowMercyClient;
 import ladysnake.snowmercy.client.render.entity.model.SledgeEntityModel;
@@ -30,14 +30,14 @@ public class SledgeEntityRenderer extends EntityRenderer<SledgeEntity> {
     public void render(SledgeEntity sledgeEntity, float f, float g, PoseStack matrixStack, MultiBufferSource vertexConsumerProvider, int i) {
         matrixStack.pushPose();
         matrixStack.translate(0.0, 0.375, 0.0);
-        matrixStack.mulPose(Vector3f.YP.rotationDegrees(180.0f - f));
+        matrixStack.mulPose(Axis.YP.rotationDegrees(180.0f - f));
         float h = (float) sledgeEntity.getDamageWobbleTicks() - g;
         float j = sledgeEntity.getDamageWobbleStrength() - g;
         if (j < 0.0f) {
             j = 0.0f;
         }
         if (h > 0.0f) {
-            matrixStack.mulPose(Vector3f.XP.rotationDegrees(Mth.sin(h) * h * j / 10.0f * (float) sledgeEntity.getDamageWobbleSide()));
+            matrixStack.mulPose(Axis.XP.rotationDegrees(Mth.sin(h) * h * j / 10.0f * (float) sledgeEntity.getDamageWobbleSide()));
         }
         matrixStack.scale(-1.0f, -1.0f, 1.0f);
 
