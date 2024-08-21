@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import ladysnake.snowmercy.cca.SnowMercyComponents;
 import ladysnake.snowmercy.common.world.ExtendedBiome;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 
@@ -24,8 +25,8 @@ public class FrozenTemperatureMixin implements ExtendedBiome {
         }
     }
 
-    @Inject(at = @At(value = "RETURN"), method = "getPrecipitation", cancellable = true)
-    private void getPrecipitation(CallbackInfoReturnable<Biome.Precipitation> cir) {
+    @Inject(at = @At(value = "RETURN"), method = "getPrecipitationAt", cancellable = true)
+    private void getPrecipitationAt(BlockPos pos, CallbackInfoReturnable<Biome.Precipitation> cir) {
         if (this.world != null && SnowMercyComponents.SNOWMERCY.isEventOngoing() && cir.getReturnValue() == Biome.Precipitation.RAIN) {
             cir.setReturnValue(Biome.Precipitation.SNOW);
         }

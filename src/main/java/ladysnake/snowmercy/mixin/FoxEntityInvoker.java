@@ -7,6 +7,6 @@ import net.minecraft.world.entity.animal.Fox;
 
 @Mixin(Fox.class)
 public interface FoxEntityInvoker {
-    @Invoker("setFoxType")
+    @Invoker("setVariant")
     public void invokeSetType(Fox.Type type);
 }

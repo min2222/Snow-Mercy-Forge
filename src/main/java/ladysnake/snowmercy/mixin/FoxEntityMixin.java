@@ -62,7 +62,7 @@ public abstract class FoxEntityMixin extends Animal {
         }
     }
 
-    @Inject(method = "getFoxType", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "getVariant", at = @At("RETURN"), cancellable = true)
     private void getFoxType(CallbackInfoReturnable<Fox.Type> callbackInfoReturnable) {
         if ((Object) this instanceof TundrabidEntity) {
             callbackInfoReturnable.setReturnValue(Fox.Type.SNOW);
