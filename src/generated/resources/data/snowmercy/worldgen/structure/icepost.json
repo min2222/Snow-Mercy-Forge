@@ -1,0 +1,6 @@
+{
+  "type": "snowmercy:icepost",
+  "biomes": "#snowmercy:pillar_biomes",
+  "spawn_overrides": {},
+  "step": "surface_structures"
+}

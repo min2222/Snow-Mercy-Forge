@@ -1,0 +1,14 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 556312282,
+    "separation": 5,
+    "spacing": 20
+  },
+  "structures": [
+    {
+      "structure": "snowmercy:icepost",
+      "weight": 1
+    }
+  ]
+}
